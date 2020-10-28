@@ -98,7 +98,7 @@ count_a.spec.jai:
 			// Any code or modules that should be loaded before the tests are run goes here…
 			// For example:
 			#load "your_main_entry_file.jai";
-		END);
+		END, <paths to custom modules go here>);
 	} else {
 		// Your normal build stuff goes here…
 	}

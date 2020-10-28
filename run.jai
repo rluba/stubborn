@@ -16,7 +16,7 @@ for %1_params {
 }
 END
 
-run_tests :: (dir: string, preamble := "") {
+run_tests :: (dir: string, preamble := "", module_paths: .. string = .[]) {
     build_options := get_build_options();
     build_options.output_type = .NO_OUTPUT;
     set_build_options(build_options);
@@ -24,7 +24,9 @@ run_tests :: (dir: string, preamble := "") {
     w := compiler_create_workspace();
     build_options.output_type = .NO_OUTPUT;
 	build_options.backend = .X64;
-	array_add(*build_options.modules_search_path_array, "modules");
+	for module_paths {
+		array_add(*build_options.modules_search_path_array, it);
+	}
     set_build_options(build_options, w);
 
 	// Generate #load statements for all test files
