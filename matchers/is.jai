@@ -8,8 +8,11 @@ matches :: (using m: *Is_Matcher($T, $E), actual: T) -> bool {
 	return is_equal(actual, expected);
 }
 
-describe :: (using m: *Is_Matcher, description: *Description) {
-	append(description, "equal to ");
+describe :: (using m: *Is_Matcher($T, $E), description: *Description) {
+	info := type_info(T);
+	append(description, "a ");
+	append(description, info.type);
+	append(description, " equal to ");
 	append_value(description, expected);
 }
 
