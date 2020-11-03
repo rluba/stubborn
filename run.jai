@@ -16,17 +16,28 @@ for %1_params {
 }
 END
 
-run_tests :: (dir: string, preamble := "", module_paths: .. string = .[]) {
+TEST_ENTRY_POINT :: "run_tests";
+
+build_tests :: (dir: string, preamble := "", module_paths: .. string = .[], run := true) {
     build_options := get_build_options();
     build_options.output_type = .NO_OUTPUT;
     set_build_options(build_options);
 
     w := compiler_create_workspace();
-    build_options.output_type = .NO_OUTPUT;
-	build_options.backend = .X64;
+
+	build_options.backend = .LLVM;
+	if run {
+		build_options.output_type = .NO_OUTPUT;
+	} else {
+		build_options.output_type = .EXECUTABLE;
+		build_options.output_executable_name = "test";
+		build_options.entry_point_name = TEST_ENTRY_POINT;
+	}
+
 	for module_paths {
 		array_add(*build_options.modules_search_path_array, it);
 	}
+
     set_build_options(build_options, w);
 
 	// Generate #load statements for all test files
@@ -55,51 +66,58 @@ run_tests :: (dir: string, preamble := "", module_paths: .. string = .[]) {
 		if !message continue;
 
 		if message.workspace == w {
-			if message.kind == .CODE_TYPECHECKED {
-				tc := cast(*Compiler_Message_Code_Typechecked) message;
-				for decl: tc.declarations {
-					if !is_test_decl(decl)	continue;
+			if message.kind == {
+				case .CODE_TYPECHECKED;
+					tc := cast(*Compiler_Message_Code_Typechecked) message;
+					for decl: tc.declarations {
+						if !is_test_decl(decl)	continue;
 
-					header := cast(*Code_Procedure_Header) decl.root_expression;
-					test: Test;
-					test.filename = copy_string(header.filename);
-					test.line_number = header.l0;
-					test.name = copy_string(header.name);
-					test.is_parameterized = header.arguments.count > 0;
+						header := cast(*Code_Procedure_Header) decl.root_expression;
+						test: Test;
+						test.filename = copy_string(header.filename);
+						test.line_number = header.l0;
+						test.name = copy_string(header.name);
+						test.is_parameterized = header.arguments.count > 0;
 
-					array_add(*tests, test);
-				}
-			} else if message.kind == .COMPILATION_PHASE {
-				mp := cast(*Compiler_Message_Compilation_Phase) message;
-				if mp.phase == .ALL_SOURCE_CODE_THAT_CAN_CURRENTLY_BE_INFERRED_IS_INFERRED && !tests_injected {
-					tests_injected = true;
-
-					intro_sort(tests, sort_by_file_and_line);
-
-					test_builder: String_Builder;
-					defer free_buffers(*test_builder);
-					append(*test_builder, "#run {\n");
-					last_filename: string;
-					for tests {
-						if compare(last_filename, it.filename) {
-							print_to_builder(*test_builder, "print(\"%%:\\n\", \"%\");\n", it.filename);
-							last_filename = it.filename;
-						}
-						if it.is_parameterized {
-							print_to_builder(*test_builder, PARAMETERIZED_TEST_TEMPLATE, it.name);
-						} else {
-							print_to_builder(*test_builder, TEST_TEMPLATE, it.name);
-						}
+						array_add(*tests, test);
 					}
-					append(*test_builder, "}\n");
+				case .COMPILATION_PHASE;
+					mp := cast(*Compiler_Message_Compilation_Phase) message;
+					if mp.phase == .ALL_SOURCE_CODE_THAT_CAN_CURRENTLY_BE_INFERRED_IS_INFERRED && !tests_injected {
+						tests_injected = true;
 
-					run_tests_code := builder_to_string(*test_builder);
-					defer free(run_tests_code);
+						intro_sort(tests, sort_by_file_and_line);
 
-					add_build_string(run_tests_code, w);
-				}
+						test_builder: String_Builder;
+						defer free_buffers(*test_builder);
+						if run {
+							append(*test_builder, "#run {\n");
+						} else {
+							append(*test_builder, TEST_ENTRY_POINT);
+							append(*test_builder, " :: () {\n");
+						}
+						last_filename: string;
+						for tests {
+							if compare(last_filename, it.filename) {
+								print_to_builder(*test_builder, "print(\"%%:\\n\", \"%\");\n", it.filename);
+								last_filename = it.filename;
+							}
+							if it.is_parameterized {
+								print_to_builder(*test_builder, PARAMETERIZED_TEST_TEMPLATE, it.name);
+							} else {
+								print_to_builder(*test_builder, TEST_TEMPLATE, it.name);
+							}
+						}
+						append(*test_builder, "}\n");
+
+						run_tests_code := builder_to_string(*test_builder);
+						defer free(run_tests_code);
+
+						add_build_string(run_tests_code, w);
+					}
+				case .COMPLETE;
+					break;
 			}
-			if message.kind == .COMPLETE break;
 		}
 	}
 

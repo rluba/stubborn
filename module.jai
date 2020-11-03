@@ -17,7 +17,12 @@ assert_that :: (actual: $T, matcher: *$M, reason := "", loc := #caller_location)
 		});
 
 		error := builder_to_string(*description.builder);
-		compiler_report_error(loc.fully_pathed_filename, loc.line_number, loc.character_number, error);
+		if get_current_workspace() == 0 {
+			print("Assertion failed at %:%:%:\n%\n", loc.fully_pathed_filename, loc.line_number, loc.character_number, error);
+			exit(1);
+		} else {
+			compiler_report_error(loc.fully_pathed_filename, loc.line_number, loc.character_number, error);
+		}
 	}
 }
 

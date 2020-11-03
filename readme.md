@@ -94,7 +94,7 @@ count_a.spec.jai:
 
 	entrypoint := ifx args.count then args[0] else "";
 	if entrypoint == "test" {
-		run_tests("<path_to_your_test_folder>", #string END
+		build_tests("<path_to_your_test_folder>", #string END
 			// Any code or modules that should be loaded before the tests are run goes here…
 			// For example:
 			#load "your_main_entry_file.jai";
@@ -105,11 +105,13 @@ count_a.spec.jai:
 }
 ```
 
-Stubborn will recursively enumerate all files ending in `.spec.jai` inside the folder you pass to `run_tests`, compile them, find all methods annotated with `@Test` and run them.
+Stubborn will recursively enumerate all files ending in `.spec.jai` inside the folder you pass to `build_tests`, compile them, find all methods annotated with `@Test` and run them.
 
 Tests will be run in the lexicographical order of their file names and in the order they’re define inside each file.
 
 The first failing assertion stops compilation.
+
+You can also compile the tests into a binary instead of running them at compile time by passing `run = false` to `build_tests`. (Useful for stepping through your tests with a debugger.)
 
 # Matchers
 
