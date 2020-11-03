@@ -26,6 +26,7 @@ assert_that :: (actual: $T, matcher: *$M, reason := "", loc := #caller_location)
 #load "matchers/contains_unordered.jai";
 #load "matchers/count.jai";
 #load "matchers/is.jai";
+#load "matchers/not.jai";
 
 #scope_module
 
