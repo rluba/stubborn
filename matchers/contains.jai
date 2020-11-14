@@ -1,4 +1,4 @@
-contains :: (itemsOrMatchers: .. $T, $is_equal: (T, T) -> bool = null) -> *Contains_Ordered_Matcher(T, is_equal) {
+contains_items :: (itemsOrMatchers: .. $T, $is_equal: (T, T) -> bool = null) -> *Contains_Ordered_Matcher(T, is_equal) {
 	// ToDo: Check if T is a matcher or not
 	// If it isn’t, we need to wrap it in a "is" matcher
 	matcher := TNew(Contains_Ordered_Matcher(T, is_equal));
