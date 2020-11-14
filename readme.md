@@ -113,6 +113,9 @@ The first failing assertion stops compilation.
 
 You can also compile the tests into a binary instead of running them at compile time by passing `run = false` to `build_tests`. (Useful for stepping through your tests with a debugger.)
 
+## Skipping tests
+You can run only a sub-set of tests by passing a list of test names as `args` to `build_tests`.
+
 # Matchers
 
 For now, this module contains only a minimal set of [Hamjest’s](https://github.com/rluba/hamjest) matchers:

@@ -7,6 +7,9 @@ print("\t%1: ");
 %1();
 print("PASSED\n");
 END
+TEST_SKIPPED_TEMPLATE :: #string END
+print("\t%1: SKIPPED\n");
+END
 
 PARAMETERIZED_TEST_TEMPLATE :: #string END
 for %1_params {
@@ -15,10 +18,16 @@ for %1_params {
 	print("PASSED\n");
 }
 END
+PARAMETERIZED_TEST_SKIPPED_TEMPLATE :: #string END
+for %1_params {
+	print("\t%1(%%): SKIPPED\n", it);
+}
+END
 
 TEST_ENTRY_POINT :: "run_tests";
 
-build_tests :: (dir: string, preamble := "", module_paths: .. string = .[], run := true) {
+// args can currently only be names of tests (to skip all other tests)
+build_tests :: (dir: string, preamble := "", module_paths: .. string = .[], args: [] string = .[], run := true) {
     build_options := get_build_options();
     build_options.output_type = .NO_OUTPUT;
     set_build_options(build_options);
@@ -73,11 +82,14 @@ build_tests :: (dir: string, preamble := "", module_paths: .. string = .[], run 
 						if !is_test_decl(decl)	continue;
 
 						header := cast(*Code_Procedure_Header) decl.root_expression;
+
 						test: Test;
 						test.filename = copy_string(header.filename);
 						test.line_number = header.l0;
 						test.name = copy_string(header.name);
 						test.is_parameterized = header.arguments.count > 0;
+						// Skip all tests that weren’t passed explicitly, if some were passed
+						test.is_skipped = args.count && !array_find(args, header.name);
 
 						array_add(*tests, test);
 					}
@@ -102,10 +114,14 @@ build_tests :: (dir: string, preamble := "", module_paths: .. string = .[], run 
 								print_to_builder(*test_builder, "print(\"%%:\\n\", \"%\");\n", it.filename);
 								last_filename = it.filename;
 							}
+							template: string;
+
 							if it.is_parameterized {
-								print_to_builder(*test_builder, PARAMETERIZED_TEST_TEMPLATE, it.name);
+								template := ifx it.is_skipped then PARAMETERIZED_TEST_SKIPPED_TEMPLATE else PARAMETERIZED_TEST_TEMPLATE;
+								print_to_builder(*test_builder, template, it.name);
 							} else {
-								print_to_builder(*test_builder, TEST_TEMPLATE, it.name);
+								template := ifx it.is_skipped then TEST_SKIPPED_TEMPLATE else TEST_TEMPLATE;
+								print_to_builder(*test_builder, template, it.name);
 							}
 						}
 						append(*test_builder, "}\n");
@@ -131,6 +147,7 @@ Test :: struct {
 	line_number: s32;
 	name: string;
 	is_parameterized: bool;
+	is_skipped: bool;
 }
 
 is_test_decl :: (decl: *Code_Declaration) -> bool {

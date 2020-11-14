@@ -39,19 +39,18 @@ TNew :: ($T: Type, $initialized := true) -> *T {
 	return New(T, initialized, __temporary_allocator, null);
 }
 
+// @ToDo: Move to a common utility module
 slice :: inline (array: [] $T, index: int, count: int) -> [] T {
-    assert(index >= 0, "index = %", index);             // @@ Should we also clamp in these cases?
+    assert(index >= 0, "index = %", index);
     assert(count >= 0, "count = %", count);
+    assert(index <= array.count, "index too large: % of %", index, array.count);
+    assert(index + count <= array.count, "index too large: % of %", index, array.count);
 	c: [] T = ---;
     if index >= array.count {
 		c.data = null;
 		c.count = 0;
 		return c;
 	}
-
-    if index + count > array.count {
-        count = array.count - index;
-    }
 
     c.data = array.data + index;
     c.count = count;
