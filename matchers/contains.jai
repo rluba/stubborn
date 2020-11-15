@@ -41,11 +41,11 @@ describe_mismatch :: (using m: *Contains_Ordered_Matcher($T, $E), actual: [] T, 
 	}
 	if actual.count > items.count {
 		indented(description, #code {
-			append_list(description, slice(actual, items.count, actual.count - items.count), start = "not matched:\n");
+			append_list(description, array_view(actual, items.count, actual.count - items.count), start = "not matched:\n");
 		});
 	} else if (actual.count < items.count) {
 		indented(description, #code {
-			append_list(description, slice(items, actual.count, items.count - actual.count), start = "missing:\n");
+			append_list(description, array_view(items, actual.count, items.count - actual.count), start = "missing:\n");
 		});
 	}
 }

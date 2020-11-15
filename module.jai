@@ -40,7 +40,7 @@ TNew :: ($T: Type, $initialized := true) -> *T {
 }
 
 // @ToDo: Move to a common utility module
-slice :: inline (array: [] $T, index: int, count: int) -> [] T {
+array_view :: inline (array: [] $T, index: int, count: int) -> [] T {
     assert(index >= 0, "index = %", index);
     assert(count >= 0, "count = %", count);
     assert(index <= array.count, "index too large: % of %", index, array.count);
