@@ -6,6 +6,7 @@ TEST_TEMPLATE :: #string END
 print("\t%1: ");
 %1();
 print("PASSED\n");
+reset_temporary_storage();
 END
 TEST_SKIPPED_TEMPLATE :: #string END
 print("\t%1: SKIPPED\n");
@@ -16,6 +17,7 @@ for %1_params {
 	print("\t%1(%%): ", it);
 	%1(it);
 	print("PASSED\n");
+	reset_temporary_storage();
 }
 END
 PARAMETERIZED_TEST_SKIPPED_TEMPLATE :: #string END
