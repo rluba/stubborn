@@ -1,11 +1,26 @@
 INTERNAL_PREAMBLE :: #string END
 #import "stubborn";
+
+print_temporary_usage :: () {
+	mark := get_temporary_storage_mark();
+	temp_use: s64;
+	temp_use = mark.occupied;
+	page := mark.top_overflow_page;
+	while page {
+		temp_use += page.size;
+		page = page.next;
+	}
+	print(" (temporary memory use: %b)", temp_use);
+}
+
 END
 
 TEST_TEMPLATE :: #string END
 print("\t%1: ");
 %1();
 print("PASSED\n");
+#if %2	print_temporary_usage();
+print("\n");
 reset_temporary_storage();
 END
 TEST_SKIPPED_TEMPLATE :: #string END
@@ -16,7 +31,9 @@ PARAMETERIZED_TEST_TEMPLATE :: #string END
 for %1_params {
 	print("\t%1(%%): ", it);
 	%1(it);
-	print("PASSED\n");
+	print("PASSED");
+	#if %2	print_temporary_usage();
+	print("\n");
 	reset_temporary_storage();
 }
 END
@@ -29,7 +46,7 @@ END
 TEST_ENTRY_POINT :: "run_tests";
 
 // args can currently only be names of tests (to skip all other tests)
-build_tests :: (dir: string, preamble := "", module_paths: .. string = .[], args: [] string = .[], run := true) {
+build_tests :: (dir: string, preamble := "", module_paths: .. string = .[], args: [] string = .[], run := true, print_temporary_memory_usage := false) {
     build_options := get_build_options();
     build_options.output_type = .NO_OUTPUT;
     set_build_options(build_options);
@@ -120,10 +137,10 @@ build_tests :: (dir: string, preamble := "", module_paths: .. string = .[], args
 
 							if it.is_parameterized {
 								template := ifx it.is_skipped then PARAMETERIZED_TEST_SKIPPED_TEMPLATE else PARAMETERIZED_TEST_TEMPLATE;
-								print_to_builder(*test_builder, template, it.name);
+								print_to_builder(*test_builder, template, it.name, print_temporary_memory_usage);
 							} else {
 								template := ifx it.is_skipped then TEST_SKIPPED_TEMPLATE else TEST_TEMPLATE;
-								print_to_builder(*test_builder, template, it.name);
+								print_to_builder(*test_builder, template, it.name, print_temporary_memory_usage);
 							}
 						}
 						append(*test_builder, "}\n");
