@@ -21,7 +21,7 @@ assert_that :: (actual: $T, matcher: *$M, reason := "", loc := #caller_location)
 			print("Assertion failed at %:%:%:\n%\n", loc.fully_pathed_filename, loc.line_number, loc.character_number, error);
 			exit(1);
 		} else {
-			compiler_report(loc.fully_pathed_filename, loc.line_number, loc.character_number, error);
+			compiler_report(error, loc);
 		}
 	}
 }
