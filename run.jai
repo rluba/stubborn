@@ -95,8 +95,8 @@ build_tests :: (dir: string, preamble := "", module_paths: .. string = .[], args
 
 		if message.workspace == w {
 			if message.kind == {
-				case .CODE_TYPECHECKED;
-					tc := cast(*Compiler_Message_Code_Typechecked) message;
+				case .TYPECHECKED;
+					tc := cast(*Message_Typechecked) message;
 					for decl: tc.declarations {
 						if !is_test_decl(decl)	continue;
 
@@ -113,8 +113,8 @@ build_tests :: (dir: string, preamble := "", module_paths: .. string = .[], args
 						array_add(*tests, test);
 					}
 				case .COMPILATION_PHASE;
-					mp := cast(*Compiler_Message_Compilation_Phase) message;
-					if mp.phase == .ALL_SOURCE_CODE_THAT_CAN_CURRENTLY_BE_INFERRED_IS_INFERRED && !tests_injected {
+					mp := cast(*Message_Phase) message;
+					if mp.phase == .TYPECHECKED_ALL_WE_CAN && !tests_injected {
 						tests_injected = true;
 
 						intro_sort(tests, sort_by_file_and_line);
