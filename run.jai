@@ -62,9 +62,7 @@ build_tests :: (dir: string, preamble := "", module_paths: .. string = .[], args
 		build_options.entry_point_name = TEST_ENTRY_POINT;
 	}
 
-	for module_paths {
-		array_add(*build_options.modules_search_path_array, it);
-	}
+	build_options.import_path = module_paths;
 
     set_build_options(build_options, w);
 
