@@ -47,13 +47,11 @@ TEST_ENTRY_POINT :: "run_tests";
 
 // args can currently only be names of tests (to skip all other tests)
 build_tests :: (dir: string, preamble := "", module_paths: .. string = .[], args: [] string = .[], run := true, print_temporary_memory_usage := false) {
-    build_options := get_build_options();
-    build_options.output_type = .NO_OUTPUT;
-    set_build_options(build_options);
+	set_build_options_dc(.{do_output = false});
 
     w := compiler_create_workspace();
+    build_options := get_build_options(w);
 
-	build_options.backend = .LLVM;
 	if run {
 		build_options.output_type = .NO_OUTPUT;
 	} else {
@@ -62,7 +60,10 @@ build_tests :: (dir: string, preamble := "", module_paths: .. string = .[], args
 		build_options.entry_point_name = TEST_ENTRY_POINT;
 	}
 
-	build_options.import_path = module_paths;
+	import_path: [..] string;
+	array_add(*import_path, .. build_options.import_path);
+	array_add(*import_path, .. module_paths);
+	build_options.import_path = import_path;
 
     set_build_options(build_options, w);
 
@@ -95,13 +96,12 @@ build_tests :: (dir: string, preamble := "", module_paths: .. string = .[], args
 			if message.kind == {
 				case .TYPECHECKED;
 					tc := cast(*Message_Typechecked) message;
-					for decl: tc.declarations {
-						if !is_test_decl(decl)	continue;
-
-						header := cast(*Code_Procedure_Header) decl.root_expression;
+					for decl: tc.procedure_headers {
+						header := decl.expression;
+						if !is_test_decl(header)	continue;
 
 						test: Test;
-						test.filename = copy_string(header.filename);
+						test.filename = copy_string(get_filename(header));
 						test.line_number = header.l0;
 						test.name = copy_string(header.name);
 						test.is_parameterized = header.arguments.count > 0;
@@ -167,12 +167,8 @@ Test :: struct {
 	is_skipped: bool;
 }
 
-is_test_decl :: (decl: *Code_Declaration) -> bool {
-	if decl.flags & .IS_IMPORTED return false; // Do not process declarations twice.
+is_test_decl :: (decl: *Code_Procedure_Header) -> bool {
 	if !decl.name || !is_alpha(decl.name[0]) return false; // Make sure it's an identifier that has a name (…and not an operator).
-
-	if !decl.root_expression return false;
-	if decl.root_expression.kind != .PROCEDURE_HEADER return false;
 
 	if !decl.notes return false;
 
