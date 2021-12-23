@@ -1,4 +1,4 @@
-// @ToDo: This should invert a matcher instead of comparing to a literal!
+// @ToDo: This should invert a matcher instead of just comparing to a literal!
 is_not :: (expected: $T, $is_equal: (T, T) -> bool = null) -> *Is_Not_Matcher(T, is_equal) {
 	matcher := TNew(Is_Not_Matcher(T, is_equal));
 	matcher.expected = expected;

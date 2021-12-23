@@ -36,7 +36,7 @@ assert_that :: (actual: $T, matcher: *$M, reason := "", loc := #caller_location)
 #scope_module
 
 TNew :: ($T: Type, $initialized := true) -> *T {
-	return New(T, initialized, __temporary_allocator, null);
+	return New(T, initialized, __temporary_allocator);
 }
 
 #scope_file

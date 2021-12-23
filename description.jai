@@ -4,16 +4,16 @@ Description :: struct {
 }
 
 append :: (using d: *Description, value: $T) {
-	#if T == string { 
+	#if T == string {
 		if indentation {
 			remaining := value;
-			index, found := index_of_char(remaining, #char "\n");
-			while found {
+			index := find_index_from_left(remaining, #char "\n");
+			while index >= 0 {
 				segment := slice(remaining, 0, index + 1);
 				remaining = slice(remaining, index + 1, remaining.count - index - 1);
 				append(*builder, segment);
 				for 0..indentation - 1	append(*builder, #char "\t");
-				index, found = index_of_char(remaining, #char "\n");
+				index = find_index_from_left(remaining, #char "\n");
 			}
 			append(*builder, remaining);
 		} else {
