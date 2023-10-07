@@ -3,8 +3,7 @@ INTERNAL_PREAMBLE :: #string END
 
 print_temporary_usage :: () {
 	mark := get_temporary_storage_mark();
-	temp_use: s64;
-	temp_use = mark.occupied;
+	temp_use: s64 = mark.total_bytes_occupied;
 	page := mark.top_overflow_page;
 	while page {
 		temp_use += page.size;
@@ -68,18 +67,23 @@ build_tests :: (dir: string, preamble := "", module_paths: .. string = .[], args
     set_build_options(build_options, w);
 
 	// Generate #load statements for all test files
-	load_builder: String_Builder;
-	defer free_buffers(*load_builder);
-	append(*load_builder, INTERNAL_PREAMBLE);
-	append(*load_builder, preamble);
+	Spec_Context :: struct {
+		dir: string;
+		builder: String_Builder;
+	}
+	spec_context: Spec_Context;
+    spec_context.dir = path_strip_filename(get_absolute_path(dir));
+	defer free_buffers(*spec_context.builder);
+	append(*spec_context.builder, INTERNAL_PREAMBLE);
+	append(*spec_context.builder, preamble);
 
-	visit_files(dir, true, *load_builder, (info: *File_Visit_Info, builder: *String_Builder) {
+	visit_files(dir, true, *spec_context, (info: *File_Visit_Info, ctx: *Spec_Context) {
 		if ends_with(info.short_name, ".spec.jai") {
-			print_to_builder(builder, "#load \"%\";", info.full_name);
+			print_to_builder(*ctx.builder, "#load \"%/%\";\n", ctx.dir, info.full_name);
 		}
 	}, follow_symlinks = false);
 
-	loads := builder_to_string(*load_builder);
+	loads := builder_to_string(*spec_context.builder);
 	defer free(loads);
 
 	compiler_begin_intercept(w);
@@ -189,6 +193,7 @@ sort_by_file_and_line :: (a: Test, b: Test) -> int {
 }
 
 #import "Compiler";
+#import "File";
 #import "File_Utilities";
 #import "Basic";
 #import "String";
