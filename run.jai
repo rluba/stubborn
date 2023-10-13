@@ -16,6 +16,7 @@ END
 
 TEST_TEMPLATE :: #string END
 print("\t%1: ");
+push_recording_logger();
 %1();
 print("PASSED\n");
 #if %2	print_temporary_usage();
@@ -28,6 +29,7 @@ END
 
 PARAMETERIZED_TEST_TEMPLATE :: #string END
 for %1_params {
+    push_recording_logger();
 	print("\t%1(%%): ", it);
 	%1(it);
 	print("PASSED");
