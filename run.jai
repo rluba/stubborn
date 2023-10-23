@@ -27,6 +27,7 @@ TEST_SKIPPED_TEMPLATE :: #string END
 print("\t%1: SKIPPED\n");
 END
 
+// @ToDo: Trim test argument summary instead of relying on "print" so that we don’t spam the console if the arguments contain huuuuuge strings
 PARAMETERIZED_TEST_TEMPLATE :: #string END
 for %1_params {
     push_recording_logger();
