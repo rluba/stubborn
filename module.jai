@@ -51,9 +51,9 @@ test_recording_logger :: (message: string, data: *void, info: Log_Info) {
     record: Log_Record;
     record.message = copy_string(message);
     record.is_error = (info.common_flags & .ERROR) != 0;
-    if context.stack_trace {
-        record.stack_trace = context.stack_trace.next;
-    }
+    // if context.stack_trace {
+    //     record.stack_trace = context.stack_trace.next;
+    // }
     array_add(*log_records, record);
 }
 
