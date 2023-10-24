@@ -94,7 +94,8 @@ count_a.spec.jai:
 
 	entrypoint := ifx args.count then args[0] else "";
 	if entrypoint == "test" {
-		build_tests("<path_to_your_test_folder>", #string END
+        options := get_build_options();
+		build_tests(options, "<path_to_your_test_folder>", #string END
 			// Any code or modules that should be loaded before the tests are run goes here…
 			// For example:
 			#load "your_main_entry_file.jai";
