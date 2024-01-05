@@ -86,7 +86,7 @@ output_recorded_log :: () {
 #scope_module
 
 TNew :: ($T: Type, $initialized := true) -> *T {
-	return New(T, initialized, __temporary_allocator);
+	return New(T, initialized,, temp);
 }
 
 #scope_file
