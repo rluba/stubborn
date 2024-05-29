@@ -86,7 +86,7 @@ build_tests :: (base_options: Build_Options, dir: string, preamble := "", module
 		if ends_with(info.short_name, ".spec.jai") {
 			print_to_builder(*ctx.builder, "#load \"%/%\";\n", ctx.dir, info.full_name);
 		}
-	}, follow_symlinks = false);
+	}, visit_symlinks = false);
 
 	loads := builder_to_string(*spec_context.builder);
 	defer free(loads);
