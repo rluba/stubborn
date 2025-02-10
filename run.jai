@@ -1,5 +1,6 @@
 INTERNAL_PREAMBLE :: #string END
 #import "stubborn";
+#import "Basic";
 
 print_temporary_usage :: () {
 	mark := get_temporary_storage_mark();
@@ -119,7 +120,7 @@ build_tests :: (base_options: Build_Options, dir: string, preamble := "", module
 
 						array_add(*tests, test);
 					}
-				case .COMPILATION_PHASE;
+				case .PHASE;
 					mp := cast(*Message_Phase) message;
 					if mp.phase == .TYPECHECKED_ALL_WE_CAN && !tests_injected {
 						tests_injected = true;
@@ -137,7 +138,7 @@ build_tests :: (base_options: Build_Options, dir: string, preamble := "", module
 						last_filename: string;
 						for tests {
 							if compare(last_filename, it.filename) {
-								print_to_builder(*test_builder, "print(\"%%:\\n\", \"%\");\n", it.filename);
+								print_to_builder(*test_builder, "print(\"\%:\\n\", \"%\");\n", it.filename);
 								last_filename = it.filename;
 							}
 							template: string;
