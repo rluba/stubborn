@@ -1,10 +1,10 @@
 
 build_comparison_matcher :: (compare_to_value : $T, compare_op : $F, compare_desc : string) -> *Comparison_Matcher(T) {
-	matcher := TNew(Comparison_Matcher(T));
+   matcher := TNew(Comparison_Matcher(T));
    matcher.compare_op = compare_op;
-	matcher.compare_to_value = compare_to_value;
+   matcher.compare_to_value = compare_to_value;
    matcher.compare_desc = compare_desc;
-	return matcher;
+   return matcher;
 
 }
 
@@ -41,16 +41,16 @@ matches :: (using m: *Comparison_Matcher($T), actual: T) -> bool {
 }
 
 describe :: (using m: *Comparison_Matcher($T), description: *Description) {
-	info := type_info(T);
-	append(description, "a ");
-	append(description, info.type);
-	append(description, m.compare_desc);
-	append_value(description, compare_to_value);
+   info := type_info(T);
+   append(description, "a ");
+   append(description, info.type);
+   append(description, m.compare_desc);
+   append_value(description, compare_to_value);
 }
 
 describe_mismatch :: (using m: *Comparison_Matcher($T), actual: T, description: *Description) {
-	append(description, "was ");
-	append_value(description, actual);
+   append(description, "was ");
+   append_value(description, actual);
 }
 
 #scope_file
