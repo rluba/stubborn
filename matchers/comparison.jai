@@ -56,7 +56,7 @@ describe_mismatch :: (using m: *Comparison_Matcher($T), actual: T, description: 
 #scope_file
 
 Comparison_Matcher :: struct (T: Type) {
-	compare_to_value: T;
+   compare_to_value: T;
    compare_op : (T, T) -> bool;
    compare_desc : string;
 }
