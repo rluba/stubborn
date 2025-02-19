@@ -20,9 +20,9 @@ describe :: (using m: *Close_To_Matcher($T), description: *Description) {
 describe_mismatch :: (using m: *Close_To_Matcher($T), actual: T, description: *Description) {
    append(description, "was ");
    append_value(description, actual);
-   append_value(description, " (delta ");
+   append(description, " (delta ");
    append_value(description, expected - actual);
-   append_value(description, ")");
+   append(description, ")");
 }
 
 #scope_file
