@@ -82,6 +82,8 @@ output_recorded_log :: () {
 #load "matchers/count.jai";
 #load "matchers/is.jai";
 #load "matchers/not.jai";
+#load "matchers/close_to.jai";
+#load "matchers/comparison.jai";
 
 #scope_module
 
