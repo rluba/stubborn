@@ -49,7 +49,7 @@ END
 TEST_ENTRY_POINT :: "run_tests";
 
 // args can currently only be names of tests (to skip all other tests)
-build_tests :: (base_options: Build_Options, dir: string, preamble := "", module_paths: .. string = .[], args: [] string = .[], run := true, print_temporary_memory_usage := false) {
+build_tests :: (base_options: Build_Options, dir: string, preamble := "", module_paths: .. string = .[], args: [] string = .[], run := true, print_temporary_memory_usage := false) {
 	set_build_options_dc(.{do_output = false});
 
     w := compiler_create_workspace();
