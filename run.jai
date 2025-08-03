@@ -29,10 +29,10 @@ print("\t%1: SKIPPED\n");
 END
 
 // @ToDo: Trim test argument summary instead of relying on "print" so that we don’t spam the console if the arguments contain huuuuuge strings
-PARAMETERIZED_TEST_TEMPLATE :: #string END
+PARAMETERIZED_TEST_TEMPLATE :: #string,\% END
 for %1_params {
     push_recording_logger();
-	print("\t%1(%%): ", it);
+	print("\t%1(\%): ", it);
 	%1(it);
 	print("PASSED");
 	#if %2	print_temporary_usage();
@@ -40,9 +40,9 @@ for %1_params {
 	reset_temporary_storage();
 }
 END
-PARAMETERIZED_TEST_SKIPPED_TEMPLATE :: #string END
+PARAMETERIZED_TEST_SKIPPED_TEMPLATE :: #string,\% END
 for %1_params {
-	print("\t%1(%%): SKIPPED\n", it);
+	print("\t%1(\%): SKIPPED\n", it);
 }
 END
 
